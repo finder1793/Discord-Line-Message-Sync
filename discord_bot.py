@@ -37,31 +37,31 @@ async def on_ready():
         print(f"Failed to sync commands: {e}")
 
 
-@client.tree.command(name="about", description="關於此機器人, 查看目前同步中的服務")
+@client.tree.command(name="about", description="About this robot, view the services currently being synchronized")
 @app_commands.describe()
 async def about(interaction: discord.Interaction):
     subscribed_info = utils.get_subscribed_info_by_discord_channel_id(str(interaction.channel.id))
     if subscribed_info:
         sync_info = f"=======================================\n" \
-                    f"Discord頻道：{subscribed_info['discord_channel_name']}\n" \
-                    f"Line群組      ：{subscribed_info['line_group_name']}\n" \
+                    f"Discord channel：{subscribed_info['discord_channel_name']}\n" \
+                    f"Line group      ：{subscribed_info['line_group_name']}\n" \
                     f"=======================================\n"
     else:
         sync_info = f"尚未綁定任何Line群組！\n"
     all_commands = await client.tree.fetch_commands()
     help_command = discord.utils.get(all_commands, name="help")
-    embed_message = discord.Embed(title="Discord <> Line 訊息同步機器人",
-                                  description=f"一個協助你同步雙平台訊息的免費服務\n\n"
-                                              f"目前同步中的服務：\n"
+    embed_message = discord.Embed(title="Discord <> Line message synchronization robot",
+                                  description=f"A free service that helps you synchronize messages between two platforms\n\n"
+                                              f"Services currently being synchronized:\n"
                                               f"{sync_info}\n"
-                                              f"此專案由 [樂弟](https://github.com/HappyGroupHub) 開發，"
-                                              f"並開源歡迎所有人共\n同維護。"
-                                              f"你可以使用指令 {help_command.mention} 了解如何\n使用此機器人\n",
+                                              f"This project is developed by [Finder](https://github.com/finder1793),"
+                                              f"And open source welcomes everyone to maintain it\n."
+                                              f"You can use the command {help_command.mention} to learn how\nto use this bot\n",
                                   color=0x2ecc71)
     embed_message.set_author(name=client.user.name, icon_url=client.user.avatar)
-    embed_message.add_field(name="作者", value="LD", inline=True)
-    embed_message.add_field(name="架設者", value=config['bot_owner'], inline=True)
-    embed_message.add_field(name="版本", value="v0.2.1", inline=True)
+    embed_message.add_field(name="author", value="LD", inline=True)
+    embed_message.add_field(name="Developer", value=config['bot_owner'], inline=True)
+    embed_message.add_field(name="Version", value="v0.2.2", inline=True)
     await interaction.response.send_message(embed=embed_message, view=AboutCommandView())
 
 
@@ -69,76 +69,76 @@ class AboutCommandView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=0)
         if 'line_bot_invite_link' in config:
-            self.add_item(discord.ui.Button(label="Line Bot邀請連結",
+            self.add_item(discord.ui.Button(label="Line Bot Invitation link",
                                             url=config['line_bot_invite_link'],
                                             style=discord.ButtonStyle.link,
                                             emoji="💬"))
-            self.add_item(discord.ui.Button(label="Line Notify邀請連結",
+            self.add_item(discord.ui.Button(label="Line Notify Invitation link",
                                             url="https://liff.line.me/1645278921-kWRPP32q/?accountId=linenotify",
                                             style=discord.ButtonStyle.link,
                                             emoji="🔔"))
         if 'discord_bot_invite_link' in config:
-            self.add_item(discord.ui.Button(label="Discord Bot邀請連結",
+            self.add_item(discord.ui.Button(label="Discord Bot Invitation link",
                                             url=config['discord_bot_invite_link'],
                                             style=discord.ButtonStyle.link,
                                             emoji="🤖", row=1))
-        self.add_item(discord.ui.Button(label="Github原始碼",
-                                        url="https://github.com/HappyGroupHub/Discord-Line-Message-Sync",
+        self.add_item(discord.ui.Button(label="Github source code",
+                                        url="https://github.com/finder1793/Discord-Line-Message-Sync",
                                         style=discord.ButtonStyle.link,
                                         emoji="🔬", row=1))
 
 
-@client.tree.command(name="help", description="此指令會協助你使用此機器人")
+@client.tree.command(name="help", description="This command will help you use this bot")
 @app_commands.describe()
 async def help(interaction: discord.Interaction):
     all_commands = await client.tree.fetch_commands()
     about_command = discord.utils.get(all_commands, name="about")
     link_command = discord.utils.get(all_commands, name="link")
     unlink_command = discord.utils.get(all_commands, name="unlink")
-    embed_message = discord.Embed(title="Discord <> Line 訊息同步機器人",
-                                  description=f"`1.` {about_command.mention}｜關於機器人\n"
-                                              f"> 查看機器人的詳細資訊, 以及目前同步中的服務\n\n"
-                                              f"`2.` {link_command.mention}｜綁定Line群組並開始同步\n"
-                                              f"> 請確保你已邀請Line bot/Line Notify至群組中\n"
-                                              f"> 並於群組中輸入 `!綁定` 來獲得Discord綁定碼\n\n"
-                                              f"`3.` {unlink_command.mention}｜解除Line群組綁定並取消同步\n"
-                                              f"> 解除與Line群組的綁定, 並取消訊息同步服務\n\n",
+    embed_message = discord.Embed(title="Discord <> Line message synchronization robot",
+                                  description=f"`1.` {about_command.mention}｜About the bot\n"
+                                              f">View the detailed information of the bot and the services currently being synchronized\n\n"
+                                              f"`2.` {link_command.mention}｜Bind Line group and start synchronization\n"
+                                              f"> Please make sure you have invited Line bot/Line Notify to the group\n"
+                                              f"> and enter `!bind` in the group to get the Discord binding code\n\n"
+                                              f"`3.` {unlink_command.mention}｜Unbind Line group and cancel synchronization\n"
+                                              f">Unbind the Line group and cancel the message synchronization service\n\n",
                                   color=0x2ecc71)
     embed_message.set_author(name=client.user.name, icon_url=client.user.avatar)
     await interaction.response.send_message(embed=embed_message)
 
 
-@client.tree.command(name="link", description="此指令用來與Line群組進行綁定, 並同步訊息")
-@app_commands.describe(binding_code="輸入你的綁定碼")
+@client.tree.command(name="link", description="This command is used to bind to the Line group and synchronize messages")
+@app_commands.describe(binding_code="Enter your binding code")
 async def link(interaction: discord.Interaction, binding_code: str):
     binding_info = utils.get_binding_code_info(binding_code)
     if not binding_info:
-        reply_message = "綁定失敗, 該綁定碼輸入錯誤或格式不正確, 請再試一次."
+        reply_message = "Binding failed. The binding code was entered incorrectly or in an incorrect format. Please try again."
         await interaction.response.send_message(reply_message, ephemeral=True)
     elif binding_info['expiration'] < time.time():
         utils.remove_binding_code(binding_code)
-        reply_message = "綁定失敗, 此綁定碼已逾5分鐘內無使用而過期, 請重新於Line群組內輸入: `!綁定`"
+        reply_message = "Binding failed. This binding code has not been used for more than 5 minutes and has expired. Please re-enter in the Line group: `!Binding`"
         await interaction.response.send_message(reply_message, ephemeral=True)
     else:
-        webhook = await interaction.channel.create_webhook(name="Line訊息同步")
+        webhook = await interaction.channel.create_webhook(name="Line message synchronization")
         utils.add_new_sync_channel(binding_info['line_group_id'], binding_info['line_group_name'],
                                    binding_info['line_notify_token'], str(interaction.channel.id),
                                    interaction.channel.name, webhook.url)
         utils.remove_binding_code(binding_code)
-        push_message = f"綁定成功！\n" \
-                       f"     ----------------------\n" \
-                       f"    |    Discord <> Line   |\n" \
-                       f"    |    訊息同步機器人   |\n" \
-                       f"     ----------------------\n\n" \
-                       f"Discord頻道：{interaction.channel.name}\n" \
-                       f"Line群組      ：{binding_info['line_group_name']}\n" \
+        push_message = f"Binding successful!\n" \
+                       f" ----------------------\n" \
+                       f" | Discord <> Line |\n" \
+                       f" | Message synchronization robot |\n" \
+                       f" ----------------------\n\n" \
+                       f"Discord channel: {interaction.channel.name}\n" \
+                       f"Line group: {binding_info['line_group_name']}\n" \
                        f"===================\n" \
-                       f"目前支援同步：文字訊息、圖片、影片、音訊"
-        reply_message = f"**【Discord <> Line 訊息同步機器人 - 綁定成功！】**\n\n" \
-                        f"Discord頻道：{interaction.channel.name}\n" \
-                        f"Line群組      ：{binding_info['line_group_name']}\n" \
+                       f"Currently supports synchronization: text messages, pictures, videos, audios"
+        reply_message = f"**【Discord <> Line message synchronization robot - binding successfully!】**\n\n" \
+                        f"Discord channel: {interaction.channel.name}\n" \
+                        f"Line group: {binding_info['line_group_name']}\n" \
                         f"========================================\n" \
-                        f"目前支援同步：文字訊息、圖片、影片、音訊"
+                        f"Currently supports synchronization: text messages, pictures, videos, audios"
         line_notify.send_message(push_message, binding_info['line_notify_token'])
         await interaction.response.send_message(reply_message)
 
@@ -149,14 +149,14 @@ async def unlink(interaction: discord.Interaction):
     channel_id = str(interaction.channel.id)
     subscribed_info = utils.get_subscribed_info_by_discord_channel_id(channel_id)
     if not subscribed_info:
-        reply_message = "此頻道並未綁定任何Line群組！"
+        reply_message = "This channel is not bound to any Line group!"
         await interaction.response.send_message(reply_message, ephemeral=True)
     else:
-        reply_message = f"**【Discord <> Line 訊息同步機器人 - 解除同步！】**\n\n" \
-                        f"Discord頻道：{subscribed_info['discord_channel_name']}\n" \
-                        f"Line群組      ：{subscribed_info['line_group_name']}\n" \
+        reply_message = f"**【Discord <> Line message synchronization bot - unsynchronize!】**\n\n" \
+                        f"Discord channel: {subscribed_info['discord_channel_name']}\n" \
+                        f"Line group: {subscribed_info['line_group_name']}\n" \
                         f"========================================\n" \
-                        f"請問確定要解除同步嗎？"
+                        f"Are you sure you want to desynchronize?"
         await interaction.response.send_message(reply_message,
                                                 view=UnlinkConfirmation(subscribed_info),
                                                 ephemeral=True)
@@ -167,30 +167,30 @@ class UnlinkConfirmation(discord.ui.View):
         super().__init__(timeout=20)
         self.subscribed_info = subscribed_info
 
-    @discord.ui.button(label="⛓️ 確認解除同步", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="⛓️Confirm desynchronization", style=discord.ButtonStyle.danger)
     async def unlink_confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         utils.remove_sync_channel_by_discord_channel_id(self.subscribed_info['discord_channel_id'])
-        push_message = f"已解除同步！\n" \
-                       f"     ----------------------\n" \
-                       f"    |    Discord <> Line   |\n" \
-                       f"    |    訊息同步機器人   |\n" \
-                       f"     ----------------------\n\n" \
-                       f"Discord頻道：{self.subscribed_info['discord_channel_name']}\n" \
-                       f"Line群組      ：{self.subscribed_info['line_group_name']}\n" \
+        push_message = f"Unsynchronized!\n" \
+                       f" ----------------------\n" \
+                       f" | Discord <> Line |\n" \
+                       f" | Message synchronization robot |\n" \
+                       f" ----------------------\n\n" \
+                       f"Discord channel: {self.subscribed_info['discord_channel_name']}\n" \
+                       f"Line group: {self.subscribed_info['line_group_name']}\n" \
                        f"===================\n" \
-                       f"執行者：{interaction.user.display_name}\n"
-        reply_message = f"**【Discord <> Line 訊息同步機器人 - 已解除同步！】**\n\n" \
-                        f"Discord頻道：{self.subscribed_info['discord_channel_name']}\n" \
-                        f"Line群組      ：{self.subscribed_info['line_group_name']}\n" \
+                       f"Executor: {interaction.user.display_name}\n"
+        reply_message = f"**【Discord <> Line message synchronization robot - desynchronized!】**\n\n" \
+                        f"Discord channel: {self.subscribed_info['discord_channel_name']}\n" \
+                        f"Line group: {self.subscribed_info['line_group_name']}\n" \
                         f"========================================\n" \
-                        f"執行者：{interaction.user.display_name}\n"
+                        f"Executor: {interaction.user.display_name}\n"
         self.stop()
         line_notify.send_message(push_message, self.subscribed_info['line_notify_token'])
         await interaction.response.send_message(reply_message)
 
-    @discord.ui.button(label="取消操作", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Cancel operation", style=discord.ButtonStyle.primary)
     async def unlink_cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        reply_message = "操作已取消！"
+        reply_message = "Operation canceled！"
         self.stop()
         await interaction.response.send_message(reply_message, ephemeral=True)
 
@@ -216,9 +216,9 @@ async def on_message(message):
                                                                    attachment.url,
                                                                    attachment.filename)
                     if message == '':
-                        message = f"{author}: 傳送了圖片"
+                        message = f"{author}: Sent picture"
                     else:
-                        message = f"{author}: {message}(圖片)"
+                        message = f"{author}: {message}(picture)"
                     line_notify.send_image_message(message, image_file_path,
                                                    subscribed_info['line_notify_token'])
                 if attachment.filename.endswith(supported_video_format):
