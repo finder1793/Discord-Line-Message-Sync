@@ -87,16 +87,16 @@ def handle_message(event):
         subscribed_line_channels = utils.get_subscribed_line_channels()
         if message_received == '!ID':
             line_bot_api.reply_message(reply_token, TextSendMessage(text=group_id))
-        elif message_received == '!綁定':
+        elif message_received == '!binding':
             if group_id in subscribed_line_channels:
-                reply_message = "此群組已綁定"
+                reply_message = "This group has been bound"
             else:
                 group_name = line_bot_api.get_group_summary(group_id).group_name
                 line_notify_state = group_id + '_' + group_name
                 auth_link = line_notify.create_auth_link(line_notify_state)
-                reply_message = f"請先點擊下方連結進行Line Notify綁定!\n" \
-                                f"並在頁面中選擇此群組後, 點擊「同意並連動」\n" \
-                                f"完成綁定後, 系統將傳送一組Discord配對碼至此群組\n" \
+                reply_message = f"Please click the link below to bind Line Notify first!\n" \
+                                f" and select this group on the page, click "Agree and Link"\n" \
+                                f"After completing the binding, the system will send a set of Discord pairing codes to this group\n" \
                                 f"\n{auth_link}"
             line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_message))
         elif group_id in subscribed_line_channels:
@@ -146,7 +146,7 @@ def handle_video(event):
             file_path = utils.download_file_from_line(subscribed_info['folder_name'], source,
                                                       event.message.type)
             discord_webhook = SyncWebhook.from_url(subscribed_info['discord_channel_webhook'])
-            discord_webhook.send(file=File(file_path), username=f"{author} - (Line訊息)",
+            discord_webhook.send(file=File(file_path), username=f"{author} - (Line)",
                                  avatar_url=author_image)
 
 
@@ -167,7 +167,7 @@ def handle_audio(event):
             file_path = utils.download_file_from_line(subscribed_info['folder_name'], source,
                                                       event.message.type)
             discord_webhook = SyncWebhook.from_url(subscribed_info['discord_channel_webhook'])
-            discord_webhook.send(file=File(file_path), username=f"{author} - (Line訊息)",
+            discord_webhook.send(file=File(file_path), username=f"{author} - (Line)",
                                  avatar_url=author_image)
 
 
@@ -181,9 +181,9 @@ def receive_from_discord():
         message = received['message']
         if received['msg_type'] == 'video':
             if message == "":
-                message = f"{received['author']}: 傳送了影片"
+                message = f"{received['author']}: Video sent"
             else:
-                message = f"{received['author']}: {message}(影片)"
+                message = f"{received['author']}: {message}(video)"
             line_notify.send_message(message, subscribed_info['line_notify_token'])
             line_bot_api.push_message(group_id,
                                       VideoSendMessage(
@@ -191,9 +191,9 @@ def receive_from_discord():
                                           preview_image_url=received['thumbnail_url']))
         if received['msg_type'] == 'audio':
             if message == "":
-                message = f"{received['author']}: 傳送了音訊"
+                message = f"{received['author']}: Message sent"
             else:
-                message = f"{received['author']}: {message}(音訊)"
+                message = f"{received['author']}: {message}(message)"
             line_notify.send_message(message, subscribed_info['line_notify_token'])
             line_bot_api.push_message(group_id,
                                       AudioSendMessage(
